@@ -1,0 +1,13 @@
+.logo {
+  margin-top: 0;
+
+  &:before {
+    content: "<";
+    display: inline-block;
+  }
+  &:after {
+    content: "/>";
+    display: inline-block;
+    margin-left: 0.2em;
+  }
+}

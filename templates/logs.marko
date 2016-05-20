@@ -1,0 +1,15 @@
+<layout-use ("../layouts/default.marko")>
+    <layout-put into="content">
+
+      <for(day in data.logs)>
+
+        <h2>${day._id}</h2>
+
+        <for(entry in day.entries)>
+          <p><time title="${entry.timestamp}">${entry.formattedTime}</time> | ${entry.message}</p>
+        </for>
+
+      </for>
+
+    </layout-put>
+</layout-use>
