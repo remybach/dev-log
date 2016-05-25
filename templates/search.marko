@@ -1,6 +1,12 @@
 <layout-use ("../layouts/default.marko")>
     <layout-put into="content">
 
+      <h2>Search results for &lsquo;${data.q}&rsquo;</h2>
+
+      <section class="no-results" if(!data.logs || data.logs.length == 0)>
+        Sorry, nothing matches your query.
+      </section>
+
       <section class="day" for(day in data.logs)>
 
         <h3>${day._id}</h3>

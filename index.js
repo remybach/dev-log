@@ -8,7 +8,8 @@ require('marko/node-require').install();
 const Hapi = require('hapi');
 const Inert = require('inert');
 const Path = require('path');
-const MongoClient = require('mongodb').MongoClient;
+const MongoDB = require('mongodb');
+const MongoClient = MongoDB.MongoClient;
 const moment = require("moment");
 const server = new Hapi.Server({
   connections: {
@@ -23,6 +24,7 @@ const server = new Hapi.Server({
 /*===== Marko Templates =====*/
 
 const logsTemplate = require('./templates/logs.marko');
+const searchTemplate = require('./templates/search.marko');
 
 /*===== Connect =====*/
 
@@ -42,7 +44,7 @@ server.route({
         if (err) throw err;
 
         db.collection('logs').insertOne({
-          timestamp: moment().valueOf(),
+          timestamp: new MongoDB.Timestamp(0, Math.floor(new Date().getTime() / 1000)),
           formattedDate: moment().format("Do MMM YYYY"),
           formattedTime: moment().format("HH:MM"),
           message: req.payload.msg
@@ -91,6 +93,46 @@ server.route({
           db.close();
         });
       
+    });
+
+  }
+});
+
+server.route({
+  method: 'POST',
+  path: '/search',
+  handler: (req, reply) => {
+
+    MongoClient.connect(config.dbUrl, (err, db) => {
+      if (err) throw err;
+
+      console.log("searching for '" + req.payload.q + "'");
+
+      let entries = db.collection('logs');
+
+      entries.aggregate([
+          { $match: { $text: { $search: req.payload.q } } },
+          {
+            $group: {
+              _id: "$formattedDate",
+              entries: {
+                $push: "$$ROOT"
+              }
+            }
+          },
+          { $sort: { timestamp: 1 } }//,
+          // { $skip: (page - 1) * 5 },
+          // { $limit: 5 }
+        ]).toArray((err, docs) => {
+          if (err) throw err;
+
+          if (utils.isJSON(req)) {
+            reply(docs);
+          } else {
+            reply(searchTemplate.stream({ logs: docs, q: req.payload.q })).type('text/html');
+          }
+      });
+
     });
 
   }

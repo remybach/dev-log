@@ -1,0 +1,30 @@
+.day {
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  padding: 1rem 0;
+
+  &:first-of-type {
+    padding-top: 0;
+  }
+  &:last-of-type {
+    border-bottom: 0;
+  }
+
+  .entry {
+    padding-left: 55px;
+    position: relative;
+  }
+
+  time {
+    left: 0;
+    position: absolute;
+    top: 0;
+
+    &:after {
+      color: rgba(0,0,0,0.3);
+      content: "•";
+      display: inline-block;
+      font-weight: 600;
+      margin-left: 0.4em;
+    }
+  }
+}
