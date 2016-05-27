@@ -32,3 +32,17 @@ h2 {
 p:last-child {
   margin-bottom: 0;
 }
+
+.btn {
+  background: #fff;
+  border: 1px solid #777;
+  padding: 0.25rem 0.5rem;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.error {
+  color: red;
+}

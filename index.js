@@ -23,6 +23,7 @@ const server = new Hapi.Server({
 
 /*===== Marko Templates =====*/
 
+const addTemplate = require('./templates/add.marko');
 const logsTemplate = require('./templates/logs.marko');
 const searchTemplate = require('./templates/search.marko');
 
@@ -30,6 +31,25 @@ const searchTemplate = require('./templates/search.marko');
 
 server.connection({ port: process.env.PORT || 1236 });
 server.register(Inert, () => {});
+
+/*===== Refactor/DRY up =====*/
+
+let addEntry = (message, callback) => {
+  MongoClient.connect(config.dbUrl, (err, db) => {
+    if (err) throw err;
+
+    db.collection('logs').insertOne({
+      timestamp: new MongoDB.Timestamp(0, Math.floor(new Date().getTime() / 1000)),
+      formattedDate: moment().format("Do MMM YYYY"),
+      formattedTime: moment().format("HH:MM"),
+      message: message
+    }, (err, result) => {
+      if (err) throw err;
+      callback();
+      db.close();
+    });
+  });
+}
 
 /*===== Routes =====*/
 
@@ -40,19 +60,8 @@ server.route({
     if (req.payload.msg) {
       console.log('Received message: ' + req.payload.msg);
 
-      MongoClient.connect(config.dbUrl, (err, db) => {
-        if (err) throw err;
-
-        db.collection('logs').insertOne({
-          timestamp: new MongoDB.Timestamp(0, Math.floor(new Date().getTime() / 1000)),
-          formattedDate: moment().format("Do MMM YYYY"),
-          formattedTime: moment().format("HH:MM"),
-          message: req.payload.msg
-        }, (err, result) => {
-          if (err) throw err;
-          reply("New log entry added.");
-          db.close();
-        });
+      addEntry(req.payload.msg, () => {
+        reply("New log entry added.");
       });
     } else {
       reply("Oops. You forgot to add a message to log!");
@@ -62,9 +71,36 @@ server.route({
 });
 
 server.route({
+  method: 'POST',
+  path: '/log',
+  handler: (req, reply) => {
+    if (req.payload.msg) {
+      console.log('Received message: ' + req.payload.msg);
+
+      addEntry(req.payload.msg, () => {
+        reply().redirect("/logs");
+      });
+    } else {
+      reply(addTemplate.stream({ error: "Oops. You forgot to add a message to log!" })).type('text/html');
+    }
+
+  }
+});
+
+server.route({
+  method: 'GET',
+  path: '/',
+  handler: (req, reply) => {
+    reply(addTemplate.stream()).type('text/html');
+  }
+});
+
+server.route({
   method: 'GET',
   path: '/logs',
   handler: (req, reply) => {
+
+    let page = req.params.page || 1;
 
     MongoClient.connect(config.dbUrl, (err, db) => {
       if (err) throw err;
@@ -79,10 +115,12 @@ server.route({
                 $push: "$$ROOT"
               }
             }
-          }
-        ]).toArray(function(err, docs) {
+          },
+          { $sort: { timestamp: 1 } }//,
+          // { $skip: (page - 1) * 5 },
+          // { $limit: 5 }
+        ]).toArray((err, docs) => {
           if (err) throw err;
-
 
           if (utils.isJSON(req)) {
             reply(docs);
