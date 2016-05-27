@@ -10,6 +10,7 @@ const Inert = require('inert');
 const Path = require('path');
 const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
+const ObjectId = MongoDB.ObjectID;
 const moment = require("moment");
 const server = new Hapi.Server({
   connections: {
@@ -83,6 +84,34 @@ server.route({
     } else {
       reply(addTemplate.stream({ error: "Oops. You forgot to add a message to log!" })).type('text/html');
     }
+
+  }
+});
+
+server.route({
+  method: 'DELETE',
+  path: '/log/{id}',
+  handler: (req, reply) => {
+
+    MongoClient.connect(config.dbUrl, (err, db) => {
+      if (err) throw err;
+
+      db.collection('logs').deleteOne({
+        _id: new ObjectId(req.params.id)
+      }, (err, results) => {
+        if (err) throw err;
+
+        let result = results.result;
+
+        if (result.ok && result.n > 0) {
+          reply().redirect("/logs");
+        } else {
+          reply("Couldn't delete that for some reason.");
+        }
+        
+        db.close();
+      });
+    });
 
   }
 });
