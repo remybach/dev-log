@@ -1,4 +1,4 @@
-# <dev-log />
+# &lt;dev-log /&gt;
 
 A server with which I keep a development log. Anything from what's tripped me up, blocked me, or simply something I've learned.
 
@@ -6,7 +6,7 @@ The UI side of it is... let's go with functional.
 
 ## An API and a web server.
 
-It's built with Hapi and attempted to be done in a RESTful way. The same urls can be called with a `Accept: application/json` header for API functionality, and without for normal website functionality (no need for all that `/api/logs` or `/logs.json` business).
+It's built with Hapi and attempted to be done in a RESTful way. The same urls can be called with an `Accept: application/json` header for API functionality, and without for normal website functionality (no need for all that `/api/logs` or `/logs.json` business).
 
 The following endpoints are currently available:
 
