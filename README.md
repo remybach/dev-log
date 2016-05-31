@@ -35,6 +35,10 @@ curl -X PUT -H "Content-Type: application/json" -d "{ 'msg': '{query}' }" 127.0.
 5. Fire up the server with `npm start`.
 6. Open <http://localhost:1236/> to start adding logs.
 
+### What about Mongo DB?
+
+You need to either roll your own, or I find that a free <mlabs.com> account is more than enough for the very occasional log/lookup/search/whatever.
+
 ## Current state of things
 
 At this stage, I'm still learning Hapi and Mongo properly so everything is still very much subject to change. On the off chance anyone actually sees this in its current state... I apologize :P
