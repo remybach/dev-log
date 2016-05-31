@@ -5,6 +5,19 @@ const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
 const ObjectId = MongoDB.ObjectID;
 
+let groupPipeline = [{
+                      $group: {
+                        _id: {
+                          year:{$year:"$timestamp"},
+                          month:{$month:"$timestamp"},
+                          day:{$dayOfMonth:"$timestamp"}
+                        },
+                        entries: {
+                          $push: "$$ROOT"
+                        }
+                      }
+                    }];
+
 module.exports.addEntry = function(req, reply) {
   if (req.payload.msg) {
     console.log('Received message: ' + req.payload.msg);
@@ -60,97 +73,62 @@ module.exports.landing = function(req, reply) {
   reply(this.templates.add.stream()).type('text/html');
 };
 
-module.exports.getLogs = function(req, reply) {
+let getLogsWithPagination = function(req, reply, pipeline, template, extraData) {
   let page = Number(req.params.page || req.query.page) || 1;
 
   MongoClient.connect(this.config.dbUrl, (err, db) => {
     if (err) throw err;
 
-    let entries = db.collection('logs').aggregate([
-        {
-          $group: {
-            _id: {
-              year:{$year:"$timestamp"},
-              month:{$month:"$timestamp"},
-              day:{$dayOfMonth:"$timestamp"}
-            },
-            entries: {
-              $push: "$$ROOT"
-            }
-          }
-        }]);
+    let entries = db.collection('logs').aggregate(pipeline);
 
     entries.toArray((err, docs) => {
+      if (err) throw err;
+
+      let numPages = Math.ceil(docs.length / this.config.pageSize);
+      let pagination;
+
+      if (numPages > 1) {
+        pagination = {
+          numPages: numPages
+        };
+
+        if (page > 1) {
+          pagination.prev = page - 1;
+        }
+        if (page + 1 <= numPages) {
+          pagination.next = page + 1;
+        }
+      }
+
+      entries.sort({ _id: -1 });
+      entries.skip((page - 1) * this.config.pageSize);
+      entries.limit(this.config.pageSize);
+
+      entries.toArray((err, docs) => {
         if (err) throw err;
 
-        let numPages = Math.ceil(docs.length / this.config.pageSize);
-        let pagination;
+        let results = Object.assign({ logs: docs, pagination: pagination }, extraData || {});
 
-        if (numPages > 1) {
-          pagination = {
-            numPages: numPages
-          };
-
-          if (page > 1) {
-            pagination.prev = page - 1;
-          }
-          if (page + 1 <= numPages) {
-            pagination.next = page + 1;
-          }
+        if (this.utils.isJSON(req)) {
+          reply(results);
+        } else {
+          reply(template.stream(results)).type('text/html');
         }
 
-        entries.sort({ _id: -1 });
-        entries.skip((page - 1) * this.config.pageSize);
-        entries.limit(this.config.pageSize);
-
-        entries.toArray((err, docs) => {
-            if (err) throw err;
-
-            let results = { logs: docs, pagination: pagination };
-
-            if (this.utils.isJSON(req)) {
-              reply(results);
-            } else {
-              reply(this.templates.logs.stream(results)).type('text/html');
-            }
-
-            db.close();
-          });
+        db.close();
       });
-    
+    });
   });
 };
 
+module.exports.getLogs = function(req, reply) {
+  getLogsWithPagination.call(this, req, reply, groupPipeline, this.templates.logs);
+};
+
 module.exports.search = function(req, reply) {
-  MongoClient.connect(this.config.dbUrl, (err, db) => {
-    if (err) throw err;
+  console.log("searching for '" + req.payload.q + "'");
 
-    console.log("searching for '" + req.payload.q + "'");
+  let pipeline = [{ $match: { $text: { $search: req.payload.q } } }].concat(groupPipeline);
 
-    let entries = db.collection('logs');
-
-    entries.aggregate([
-        { $match: { $text: { $search: req.payload.q } } },
-        {
-          $group: {
-            _id: "$formattedDate",
-            entries: {
-              $push: "$$ROOT"
-            }
-          }
-        },
-        { $sort: { timestamp: 1 } }//,
-        // { $skip: (page - 1) * 5 },
-        // { $limit: 5 }
-      ]).toArray((err, docs) => {
-        if (err) throw err;
-
-        if (this.utils.isJSON(req)) {
-          reply(docs);
-        } else {
-          reply(this.templates.search.stream({ logs: docs, q: req.payload.q })).type('text/html');
-        }
-    });
-
-  });
+  getLogsWithPagination.call(this, req, reply, pipeline, this.templates.search, { q: req.payload.q });
 }
