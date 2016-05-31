@@ -11,7 +11,7 @@
 
       </section>
 
-      <nav class="pagination" if=(data.pagination)>
+      <nav class="pagination" if(data.pagination)>
         <a href="?page=${data.pagination.prev}" if(data.pagination.prev)>&lt; Previous Page</a>
         <a href="?page=${data.pagination.next}" if(data.pagination.next)>Next Page &gt;</a>
       </nav>

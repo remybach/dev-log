@@ -22,6 +22,7 @@ const server = new Hapi.Server({
 
 server.connection({ port: process.env.PORT || 1236 });
 server.register(Inert, () => {});
+
 server.bind({
   config: require('./config'),
   templates: {
@@ -33,6 +34,12 @@ server.bind({
 });
 
 /*===== Routes =====*/
+
+server.route({
+  method: 'GET',
+  path: '/',
+  handler: Handlers.landing
+});
 
 server.route({
   method: 'PUT',
@@ -54,12 +61,6 @@ server.route({
 
 server.route({
   method: 'GET',
-  path: '/',
-  handler: Handlers.landing
-});
-
-server.route({
-  method: 'GET',
   path: '/logs',
   handler: Handlers.getLogs
 });
@@ -73,21 +74,21 @@ server.route({
 /*===== Public Assets =====*/
 
 server.route({
-    method: 'GET',
-    path: '/public/{param*}',
-    handler: {
-        directory: {
-            path: '.',
-            redirectToSlash: true,
-            index: true
-        }
+  method: 'GET',
+  path: '/public/{param*}',
+  handler: {
+    directory: {
+      path: '.',
+      redirectToSlash: true,
+      index: true
     }
+  }
 });
 
 /*===== Start =====*/
 
 server.start((err) => {
-    if (err) throw err;
+  if (err) throw err;
 
-    console.log('Server running at:', server.info.uri);
+  console.log('Server running at:', server.info.uri);
 });

@@ -8,7 +8,7 @@
     "styles_dev": "node-sass --watch public/styles/main.scss public/main.css",
     "webpack_dev": "webpack --progress --colors --watch",
     "dev": "npm run styles_dev | npm run webpack_dev",
-    "start": "npm run styles | webpack"
+    "start": "npm run styles | webpack | node index.js"
   },
   "author": "Remy Bach",
   "license": "ISC",
