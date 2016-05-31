@@ -1,5 +1,6 @@
 'use strict';
 
+const moment = require("moment");
 const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
 const ObjectId = MongoDB.ObjectID;
@@ -76,7 +77,7 @@ module.exports.getLogs = function(req, reply) {
             }
           }
         },
-        { $sort: { timestamp: 1 } }//,
+        { $sort: { _id: -1 } }//,
         // { $skip: (page - 1) * 5 },
         // { $limit: 5 }
       ]).toArray((err, docs) => {

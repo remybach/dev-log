@@ -7,7 +7,7 @@ require('marko/node-require').install();
 const Hapi = require('hapi');
 const Inert = require('inert');
 const Path = require('path');
-const moment = require("moment");
+
 const server = new Hapi.Server({
   connections: {
     routes: {
