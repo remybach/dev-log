@@ -61,14 +61,12 @@ module.exports.landing = function(req, reply) {
 };
 
 module.exports.getLogs = function(req, reply) {
-  let page = req.params.page || req.query.page || 1;
+  let page = Number(req.params.page || req.query.page) || 1;
 
   MongoClient.connect(this.config.dbUrl, (err, db) => {
     if (err) throw err;
 
-    let entries = db.collection('logs');
-
-    entries.aggregate([
+    let entries = db.collection('logs').aggregate([
         {
           $group: {
             _id: {
@@ -80,20 +78,44 @@ module.exports.getLogs = function(req, reply) {
               $push: "$$ROOT"
             }
           }
-        },
-        { $sort: { _id: -1 } },
-        { $skip: (page - 1) * 3 },
-        { $limit: 3 }
-      ]).toArray((err, docs) => {
+        }]);
+
+    entries.toArray((err, docs) => {
         if (err) throw err;
 
-        if (this.utils.isJSON(req)) {
-          reply(docs);
-        } else {
-          reply(this.templates.logs.stream({ logs: docs })).type('text/html');
+        let numPages = Math.ceil(docs.length / this.config.pageSize);
+        let pagination;
+
+        if (numPages > 1) {
+          pagination = {
+            numPages: numPages
+          };
+
+          if (page > 1) {
+            pagination.prev = page - 1;
+          }
+          if (page + 1 <= numPages) {
+            pagination.next = page + 1;
+          }
         }
 
-        db.close();
+        entries.sort({ _id: -1 });
+        entries.skip((page - 1) * this.config.pageSize);
+        entries.limit(this.config.pageSize);
+
+        entries.toArray((err, docs) => {
+            if (err) throw err;
+
+            let results = { logs: docs, pagination: pagination };
+
+            if (this.utils.isJSON(req)) {
+              reply(results);
+            } else {
+              reply(this.templates.logs.stream(results)).type('text/html');
+            }
+
+            db.close();
+          });
       });
     
   });
