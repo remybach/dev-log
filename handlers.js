@@ -71,7 +71,11 @@ module.exports.getLogs = function(req, reply) {
     entries.aggregate([
         {
           $group: {
-            _id: "$formattedDate",
+            _id: {
+              year:{$year:"$timestamp"},
+              month:{$month:"$timestamp"},
+              day:{$dayOfMonth:"$timestamp"}
+            },
             entries: {
               $push: "$$ROOT"
             }
