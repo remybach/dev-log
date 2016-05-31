@@ -61,7 +61,7 @@ module.exports.landing = function(req, reply) {
 };
 
 module.exports.getLogs = function(req, reply) {
-  let page = req.params.page || 1;
+  let page = req.params.page || req.query.page || 1;
 
   MongoClient.connect(this.config.dbUrl, (err, db) => {
     if (err) throw err;
@@ -81,9 +81,9 @@ module.exports.getLogs = function(req, reply) {
             }
           }
         },
-        { $sort: { _id: -1 } }//,
-        // { $skip: (page - 1) * 5 },
-        // { $limit: 5 }
+        { $sort: { _id: -1 } },
+        { $skip: (page - 1) * 3 },
+        { $limit: 3 }
       ]).toArray((err, docs) => {
         if (err) throw err;
 
