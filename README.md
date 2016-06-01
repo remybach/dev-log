@@ -6,7 +6,7 @@ The UI side of it is... let's go with functional.
 
 ## An API and a web server.
 
-It's built with Hapi and attempted to be done in a RESTful way. The same urls can be called with an `Accept: application/json` header for API functionality, and without for normal website functionality (no need for all that `/api/logs` or `/logs.json` business).
+It's built with [Hapi] and attempted to be done in a RESTful way. The same urls can be called with an `Accept: application/json` header for API functionality, and without for normal website functionality (no need for all that `/api/logs` or `/logs.json` business).
 
 The following endpoints are currently available:
 
@@ -37,14 +37,19 @@ curl -X PUT -H "Content-Type: application/json" -d "{ 'msg': '{query}' }" 127.0.
 
 ### What about Mongo DB?
 
-You need to either roll your own, or I find that a free <mlabs.com> account is more than enough for the very occasional log/lookup/search/whatever.
+You need to either roll your own, or I find that a free [mlabs] account is more than enough for the very occasional log/lookup/search/whatever.
 
 ## Current state of things
 
-At this stage, I'm still learning Hapi and Mongo properly so everything is still very much subject to change. On the off chance anyone actually sees this in its current state... I apologize :P
+At this stage, I'm still learning [Hapi], [Mongo], and [Marko] properly so everything is still very much subject to change. On the off chance anyone actually sees this in its current state... I apologize :P
 
 ### TODO
 
 + Delete logs (from the UI).
 + Edit logs.
 + Try to get a better design happening.
+
+[Hapi]: http://hapijs.com
+[mlabs]: http://mlabs.com
+[Marko]: http://markojs.com
+[Mongo]: https://mongodb.com
