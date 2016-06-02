@@ -45,6 +45,8 @@ At this stage, I'm still learning [Hapi], [Mongo], and [Marko] properly so every
 
 ### TODO
 
++ Allow markdown formatting in logs by using `handlebars-helper-md`.
++ Ditch saving formatted date and time (left over of rapidly prototyping) and use `handlebars-helper-moment`.
 + Delete logs (from the UI).
 + Edit logs.
 + Try to get a better design happening.
