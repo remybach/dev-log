@@ -1,6 +1,7 @@
 'use strict';
 
 const Handlers = require('./handlers');
+const Config = require('./config');
 
 require('marko/node-require').install();
 
@@ -21,10 +22,9 @@ const server = new Hapi.Server({
 /*===== Connect =====*/
 
 server.connection({ port: process.env.PORT || 1236 });
-server.register(Inert, () => {});
 
 server.bind({
-  config: require('./config'),
+  config: Config,
   templates: {
     add: require('./templates/add.marko'),
     logs: require('./templates/logs.marko'),
@@ -32,6 +32,18 @@ server.bind({
   },
   utils: require('./utils')
 });
+
+/*===== Plugins =====*/
+
+server.register({
+  register: require('hapi-mongodb'),
+  options: {
+    url: Config.dbUrl
+  }
+}, (err) => {
+  if (err) throw err;
+});
+server.register(Inert, () => {});
 
 /*===== Routes =====*/
 
