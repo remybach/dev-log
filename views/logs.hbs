@@ -4,16 +4,6 @@
 </section>
 {{/if}}
 
-{{#each logs}}
-
-  <section class="day">
-
-    <h3>{{this.entries.0.formattedDate}}</h3>
-
-    {{> entries entries=this.entries }}
-
-  </section>
-
-{{/each}}
+{{> logs logs=logs }}
 
 {{> pagination pagination=pagination }}
