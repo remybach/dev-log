@@ -36,8 +36,6 @@ module.exports.addEntry = function(req, reply) {
       } else {
         reply().redirect("/logs");
       }
-
-      db.close();
     });
   } else {
     reply("Oops. You forgot to add a message to log!");
@@ -59,19 +57,17 @@ module.exports.deleteEntry = function(req, reply) {
     } else {
       reply("Couldn't delete that for some reason.");
     }
-    
-    db.close();
   });
 };
 
 module.exports.landing = function(req, reply) {
-  reply(this.templates.add.stream()).type('text/html');
+  reply.view('add');
 };
 
-let getLogsWithPagination = function(req, reply, pipeline, template, extraData) {
+let getLogsWithPagination = function(req, reply, pipeline, view, extraData) {
   const db = req.server.plugins['hapi-mongodb'].db;
-  let page = Number(req.params.page || req.query.page) || 1;
 
+  let page = Number(req.params.page || req.query.page) || 1;
   let entries = db.collection('logs').aggregate(pipeline);
 
   entries.toArray((err, docs) => {
@@ -100,27 +96,25 @@ let getLogsWithPagination = function(req, reply, pipeline, template, extraData) 
     entries.toArray((err, docs) => {
       if (err) throw err;
 
-      let results = Object.assign({ logs: docs, pagination: pagination }, extraData || {});
+      let results = Object.assign({ logs: docs, pagination: pagination, noResults: (!docs || docs.length == 0) }, extraData || {});
 
       if (this.utils.isJSON(req)) {
         reply(results);
       } else {
-        reply(template.stream(results)).type('text/html');
+        reply.view(view, results);
       }
-
-      db.close();
     });
   });
 };
 
 module.exports.getLogs = function(req, reply) {
-  getLogsWithPagination.call(this, req, reply, groupPipeline, this.templates.logs);
+  getLogsWithPagination.call(this, req, reply, JSON.parse(JSON.stringify(groupPipeline)), 'logs');
 };
 
 module.exports.search = function(req, reply) {
   console.log("searching for '" + req.payload.q + "'");
 
-  let pipeline = [{ $match: { $text: { $search: req.payload.q } } }].concat(groupPipeline);
+  let pipeline = [{ $match: { $text: { $search: req.payload.q } } }].concat(JSON.parse(JSON.stringify(groupPipeline)));
 
-  getLogsWithPagination.call(this, req, reply, pipeline, this.templates.search, { q: req.payload.q });
+  getLogsWithPagination.call(this, req, reply, pipeline, 'search', { q: req.payload.q });
 }

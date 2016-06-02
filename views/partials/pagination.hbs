@@ -1,0 +1,10 @@
+{{#if pagination}}
+  <nav class="pagination">
+    {{#if pagination.prev}}
+      <a href="?page={{pagination.prev}}">&lt; Previous Page</a>
+    {{/if}}
+    {{#if pagination.next}}
+      <a href="?page={{pagination.next}}">Next Page &gt;</a>
+    {{/if}}
+  </nav>
+{{/if}}

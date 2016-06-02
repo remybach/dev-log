@@ -1,0 +1,21 @@
+<h2>Search results for &lsquo;{{q}}&rsquo;</h2>
+
+{{#if noResults}}
+<section class="no-results">
+  Sorry, nothing matches your query.
+</section>
+{{/if}}
+
+{{#each logs}}
+
+  <section class="day">
+
+    <h3>{{this.entries.0.formattedDate}}</h3>
+
+    {{> entries entries=this.entries }}
+
+  </section>
+
+{{/each}}
+
+{{> pagination pagination=pagination }}

@@ -1,0 +1,15 @@
+<h2>Add a new entry below</h2>
+
+<form action="/log" method="POST">
+
+  {{#if error}}
+  <div if=(error) class="error">
+    ${error}
+  </div>
+  {{/if}}
+
+  <input type="text" class="add-entry" name="msg" required />
+
+  <input type="submit" value="Add" class="btn" />
+
+</form>

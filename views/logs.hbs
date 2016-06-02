@@ -1,0 +1,19 @@
+{{#if noResults}}
+<section class="no-results">
+  You haven't logged anything yet!
+</section>
+{{/if}}
+
+{{#each logs}}
+
+  <section class="day">
+
+    <h3>{{this.entries.0.formattedDate}}</h3>
+
+    {{> entries entries=this.entries }}
+
+  </section>
+
+{{/each}}
+
+{{> pagination pagination=pagination }}
