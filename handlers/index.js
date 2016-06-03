@@ -82,10 +82,10 @@ let getLogsWithPagination = function(req, reply, pipeline, view, extraData) {
       };
 
       if (page > 1) {
-        pagination.prev = page - 1;
+        pagination.prev = '?page=' + (page - 1) + (req.query.q ? '&q=' + req.query.q: '');
       }
       if (page + 1 <= numPages) {
-        pagination.next = page + 1;
+        pagination.next = '?page=' + (page + 1) + (req.query.q ? '&q=' + req.query.q: '');
       }
     }
 
@@ -112,9 +112,9 @@ module.exports.getLogs = function(req, reply) {
 };
 
 module.exports.search = function(req, reply) {
-  console.log("searching for '" + req.payload.q + "'");
+  console.log("searching for '" + req.query.q + "'");
 
-  let pipeline = [{ $match: { $text: { $search: req.payload.q } } }].concat(JSON.parse(JSON.stringify(groupPipeline)));
+  let pipeline = [{ $match: { $text: { $search: req.query.q } } }].concat(JSON.parse(JSON.stringify(groupPipeline)));
 
-  getLogsWithPagination.call(this, req, reply, pipeline, 'search', { q: req.payload.q });
+  getLogsWithPagination.call(this, req, reply, pipeline, 'search', { q: req.query.q });
 }

@@ -84,7 +84,7 @@ server.route({
 });
 
 server.route({
-  method: 'POST',
+  method: 'GET',
   path: '/search',
   handler: Handlers.search
 });
