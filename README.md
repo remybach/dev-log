@@ -41,17 +41,8 @@ You need to either roll your own, or I find that a free [mlabs] account is more 
 
 ## Current state of things
 
-At this stage, I'm still learning [Hapi], [Mongo], and [Marko] properly so everything is still very much subject to change. On the off chance anyone actually sees this in its current state... I apologize :P
-
-### TODO
-
-+ Allow markdown formatting in logs by using `handlebars-helper-md`.
-+ Ditch saving formatted date and time (left over of rapidly prototyping) and use `handlebars-helper-moment`.
-+ Delete logs (from the UI).
-+ Edit logs.
-+ Try to get a better design happening.
+At this stage, I'm still learning [Hapi], and [Mongo] properly so everything is still very much subject to change. On the off chance anyone actually sees this in its current state... I apologize :P
 
 [Hapi]: http://hapijs.com
 [mlabs]: http://mlabs.com
-[Marko]: http://markojs.com
 [Mongo]: https://mongodb.com
