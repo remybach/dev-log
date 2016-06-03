@@ -66,13 +66,7 @@ server.route({
 });
 
 server.route({
-  method: 'PUT',
-  path: '/log',
-  handler: Handlers.addEntry
-});
-
-server.route({
-  method: 'POST',
+  method: ['PUT', 'POST'],
   path: '/log',
   handler: Handlers.addEntry
 });
