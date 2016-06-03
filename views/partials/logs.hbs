@@ -2,11 +2,11 @@
 
   <section class="day">
 
-    <h3>{{this.entries.0.formattedDate}}</h3>
+    <h3>{{moment this.entries.0.timestamp format="Do MMMM YYYY"}}</h3>
 
     {{#each entries as |entry|}}
       <p class="entry">
-        <time title="{{entry.timestamp}}">{{entry.formattedTime}}</time>
+        <time title="{{entry.timestamp}}">{{moment entry.timestamp format="HH:mm"}}</time>
         {{md entry.message}}
       </p>
     {{/each}}

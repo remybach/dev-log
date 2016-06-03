@@ -1,6 +1,5 @@
 'use strict';
 
-const moment = require("moment");
 const MongoDB = require('mongodb');
 const ObjectId = MongoDB.ObjectID;
 
@@ -25,8 +24,6 @@ module.exports.addEntry = function(req, reply) {
 
     db.collection('logs').insertOne({
       timestamp: new MongoDB.Timestamp(0, Math.floor(new Date().getTime() / 1000)),
-      formattedDate: moment().format("Do MMM YYYY"),
-      formattedTime: moment().format("HH:MM"),
       message: req.payload.msg
     }, (err, result) => {
       if (err) throw err;
