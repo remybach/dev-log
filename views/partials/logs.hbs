@@ -5,7 +5,10 @@
     <h3>{{this.entries.0.formattedDate}}</h3>
 
     {{#each entries as |entry|}}
-      <p class="entry"><time title="{{entry.timestamp}}">{{entry.formattedTime}}</time>{{entry.message}}</p>
+      <p class="entry">
+        <time title="{{entry.timestamp}}">{{entry.formattedTime}}</time>
+        {{md entry.message}}
+      </p>
     {{/each}}
 
   </section>
