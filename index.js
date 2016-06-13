@@ -77,6 +77,13 @@ server.route({
   handler: Handlers.deleteEntry
 });
 
+// Side note: stupid browsers not allowing us to use proper REST methods.
+server.route({
+  method: 'POST',
+  path: '/log/{id}/delete',
+  handler: Handlers.deleteEntry
+});
+
 server.route({
   method: ['PATCH', 'POST'],
   path: '/log/{id}',
