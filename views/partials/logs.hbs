@@ -5,10 +5,13 @@
     <h3>{{moment this.entries.0.timestamp format="Do MMMM YYYY"}}</h3>
 
     {{#each entries as |entry|}}
-      <p class="entry">
+      <div class="entry">
         <time title="{{entry.timestamp}}">{{moment entry.timestamp format="HH:mm"}}</time>
-        {{md entry.message}}
-      </p>
+        <form action="/log/{{entry._id}}" method="POST">
+          <input type="text" name="msg" id="entry_{{entry.timestamp}}" value="{{entry.message}}" />
+          <label for="entry_{{entry.timestamp}}">{{md entry.message}}</label>
+        </form>
+      </div>
     {{/each}}
 
   </section>

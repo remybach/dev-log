@@ -57,6 +57,34 @@ module.exports.deleteEntry = function(req, reply) {
   });
 };
 
+module.exports.updateEntry = function(req, reply) {
+  if (req.params.msg || req.payload.msg) {
+    const db = req.server.plugins['hapi-mongodb'].db;
+
+    console.log("Attempting to update entry " + req.params.id + " with: '" + req.payload.msg + "'");
+
+    db.collection('logs').update({
+      _id: new ObjectId(req.params.id)
+    }, {
+      $set: {
+        message: req.params.msg || req.payload.msg
+      }
+    }, null, function(err, results) {
+      if (err) throw err;
+
+      let result = results.result;
+
+      if (result.ok && result.n > 0) {
+        reply().redirect("/logs");
+      } else {
+        reply("Couldn't update that for some reason.");
+      }
+    });
+  } else {
+    reply("Oops. The message hasn't made it's way through!");
+  }
+};
+
 module.exports.landing = function(req, reply) {
   reply.view('add');
 };

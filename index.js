@@ -78,6 +78,12 @@ server.route({
 });
 
 server.route({
+  method: ['PATCH', 'POST'],
+  path: '/log/{id}',
+  handler: Handlers.updateEntry
+});
+
+server.route({
   method: 'GET',
   path: '/logs',
   handler: Handlers.getLogs
