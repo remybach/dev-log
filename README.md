@@ -10,13 +10,15 @@ It's built with [Hapi] and attempted to be done in a RESTful way. The same urls 
 
 The following endpoints are currently available:
 
-| Endpoint            | Method   | Details                                                             |                  
-|---------------------|----------|---------------------------------------------------------------------|
-| `/`                 |          | Just a landing page with the added ability to post a new log entry. |
-| `/log`              | PUT/POST | Add a new log entry by sending a `msg` parameter                    |
-| `/log/{id}`         | DELETE   | Delete the given log entry.                                         |
-| `/logs`             | GET      | Retrieve a list of all the current logs.                            |
-| `/search?q={query}` | POST     | Search the logs for `{query}`                                       |
+| Endpoint            | Method    | Details                                                                   |
+|---------------------|-----------|---------------------------------------------------------------------------|
+| `/`                 |           | Just a landing page with the added ability to post a new log entry.       |
+| `/log`              | PUT/POST  | Add a new log entry by sending a `msg` parameter                          |
+| `/log/{id}`         | PATCH/POST| Edit/update the given log entry.                                          |
+| `/log/{id}`         | DELETE    | Delete the given log entry.                                               |
+| `/log/{id}/delete`  | POST      | Another delete because browsers suck and don't support the DELETE method. |
+| `/logs`             | GET       | Retrieve a list of all the current logs.                                  |
+| `/search?q={query}` | POST      | Search the logs for `{query}`                                             |
 
 ### Alfred
 
@@ -43,6 +45,17 @@ You need to either roll your own, or I find that a free [mlabs] account is more 
 
 At this stage, I'm still learning [Hapi], and [Mongo] properly so everything is still very much subject to change. On the off chance anyone actually sees this in its current state... I apologize :P
 
+## The UI
+
+As mentioned above... the UI is serviceable. Below is a screenshot of what it looks like (using the awesome [redacted font][redacted]):
+
+---
+
+![Screenshot of dev-log UI](screenshot.png)
+
+---
+
 [Hapi]: http://hapijs.com
 [mlabs]: http://mlabs.com
 [Mongo]: https://mongodb.com
+[redacted]: https://github.com/christiannaths/Redacted-Font
