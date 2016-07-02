@@ -3,8 +3,6 @@
 const Handlers = require('./handlers');
 const Config = require('./config');
 
-require('marko/node-require').install();
-
 const Bcrypt = require('bcrypt');
 const Hapi = require('hapi');
 const Basic = require('hapi-auth-basic');
