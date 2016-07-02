@@ -1,4 +1,6 @@
 module.exports = {
   dbUrl: "mongodb://127.0.0.1:27017/dev-log",
-  pageSize: 3
+  pageSize: 3,
+  username: 'your_user_name',
+  password: 'your_password_after_bcrypt_hashing'
 };

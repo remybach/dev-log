@@ -5,7 +5,9 @@ const Config = require('./config');
 
 require('marko/node-require').install();
 
+const Bcrypt = require('bcrypt');
 const Hapi = require('hapi');
+const Basic = require('hapi-auth-basic');
 const Path = require('path');
 
 const server = new Hapi.Server({
@@ -57,69 +59,88 @@ server.register([
 
 });
 
-/*===== Routes =====*/
+// Authentication
 
-server.route({
-  method: 'GET',
-  path: '/',
-  handler: Handlers.landing
-});
-
-server.route({
-  method: ['PUT', 'POST'],
-  path: '/log',
-  handler: Handlers.addEntry
-});
-
-server.route({
-  method: 'DELETE',
-  path: '/log/{id}',
-  handler: Handlers.deleteEntry
-});
-
-// Side note: stupid browsers not allowing us to use proper REST methods.
-server.route({
-  method: 'POST',
-  path: '/log/{id}/delete',
-  handler: Handlers.deleteEntry
-});
-
-server.route({
-  method: ['PATCH', 'POST'],
-  path: '/log/{id}',
-  handler: Handlers.updateEntry
-});
-
-server.route({
-  method: 'GET',
-  path: '/logs',
-  handler: Handlers.getLogs
-});
-
-server.route({
-  method: 'GET',
-  path: '/search',
-  handler: Handlers.search
-});
-
-/*===== Public Assets =====*/
-
-server.route({
-  method: 'GET',
-  path: '/public/{param*}',
-  handler: {
-    directory: {
-      path: '.',
-      redirectToSlash: true,
-      index: true
-    }
+const validate = function (request, username, password, callback) {
+  if (username !== Config.username) {
+    return callback(null, false);
   }
-});
 
-/*===== Start =====*/
+  Bcrypt.compare(password, Config.password, (err, isValid) => {
+    callback(err, isValid, { id: 1, name: Config.username });
+  });
+};
 
-server.start((err) => {
+server.register(Basic, (err) => {
+
   if (err) throw err;
 
-  console.log('Server running at:', server.info.uri);
+  server.auth.strategy('simple', 'basic', true, { validateFunc: validate });
+
+  /*===== Routes =====*/
+
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: Handlers.landing
+  });
+
+  server.route({
+    method: ['PUT', 'POST'],
+    path: '/log',
+    handler: Handlers.addEntry
+  });
+
+  server.route({
+    method: 'DELETE',
+    path: '/log/{id}',
+    handler: Handlers.deleteEntry
+  });
+
+  // Side note: stupid browsers not allowing us to use proper REST methods.
+  server.route({
+    method: 'POST',
+    path: '/log/{id}/delete',
+    handler: Handlers.deleteEntry
+  });
+
+  server.route({
+    method: ['PATCH', 'POST'],
+    path: '/log/{id}',
+    handler: Handlers.updateEntry
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/logs',
+    handler: Handlers.getLogs
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/search',
+    handler: Handlers.search
+  });
+
+  /*===== Public Assets =====*/
+
+  server.route({
+    method: 'GET',
+    path: '/public/{param*}',
+    handler: {
+      directory: {
+        path: '.',
+        redirectToSlash: true,
+        index: true
+      }
+    }
+  });
+
+  /*===== Start =====*/
+
+  server.start((err) => {
+    if (err) throw err;
+
+    console.log('Server running at:', server.info.uri);
+  });
 });
